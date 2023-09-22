@@ -10,23 +10,18 @@ use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/product')]
 class ProductController extends AbstractController
 {
-    #[Route('/', name: 'app_product_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
-    {
-        return $this->render('product/index.html.twig', [
-            'products' => $productRepository->findAll(),
-        ]);
-    }
 
     #[Route('/new-products', name: 'product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator, ProductCategoryRepository $productCategoryRepository): Response
@@ -66,40 +61,62 @@ class ProductController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
-    public function show(Product $product): Response
+    #[Route('/{id}', name: 'product_show', methods: ['GET'])]
+    public function getProduct(Product $product, int $id): Response
     {
-        return $this->render('product/show.html.twig', [
-            'product' => $product,
+        if (!$product) {
+            return new JsonResponse([
+                'error_message' => 'Le produit avec l\'ID ' . $id . ' n\'existe pas.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+        return $this->json($product, 200, [], 
+        [
+            'groups' => 'get_products'
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    #[Route('/edit/{id}', name: 'product_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, int $id, ManagerRegistry $doctrine, SerializerInterface $serializer, ProductCategoryRepository $productCategoryRepository): Response
     {
-        $form = $this->createForm(ProductType::class, $product);
-        $form->handleRequest($request);
+        $entityManager = $doctrine->getManager();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        $product = $entityManager->getRepository(Product::class)->find($id);
 
-            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+        if (!$product) {
+            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
-        return $this->renderForm('product/edit.html.twig', [
-            'product' => $product,
-            'form' => $form,
+        $content = $request->getContent(); // Get json from request
+        $jsonContentBis = json_decode($content, true); 
+        $updateProduct = $serializer->deserialize($content, Product::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
+
+        $productCategory = $productCategoryRepository->find($jsonContentBis['product_category']); 
+        $updateProduct->setProductCategory($productCategory);
+
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'success_message' => 'Produit mis à jour.'
         ]);
     }
 
-    #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
-    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'product_delete', methods: ['POST'])]
+    public function delete(ManagerRegistry $doctrine, int $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($product);
-            $entityManager->flush();
+        $entityManager = $doctrine->getManager();
+        $product = $entityManager->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$id
+            );
         }
 
-        return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+        $entityManager->remove($product);
+        $entityManager->flush();
+        return new JsonResponse([
+            'success_message' => 'Produit supprimé.'
+        ]);
     }
 }
