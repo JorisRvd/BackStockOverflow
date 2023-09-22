@@ -15,29 +15,40 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+<<<<<<< Updated upstream
+=======
+    /**
+     *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
+     */
+>>>>>>> Stashed changes
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     /**
      *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
      */
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     /**
      *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
      */
     private ?string $description = null;
 
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
      */
     private ?int $quantity = null;
 
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
      */
     private ?bool $is_active = null;
 

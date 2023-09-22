@@ -15,15 +15,22 @@ class ProductCategory
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    /**
+     * @Groups({"get_category"})
+     */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     /**
      *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
      */
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'product_category', targetEntity: Product::class)]
+    /**
+     * @Groups({"get_category"})
+     */
     private Collection $products;
 
     public function __construct()
