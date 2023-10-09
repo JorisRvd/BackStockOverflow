@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Enums\OrderStatus;
 use App\Repository\UserRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
@@ -22,6 +23,7 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 #[Route('/order')]
 class OrderController extends AbstractController
 {
+    
     #[Route('/', name: 'order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
@@ -55,7 +57,6 @@ class OrderController extends AbstractController
         }
 
         $errors = $validator->validate($newOrder);
-
         // Si les champs user_id et/ou product_id sont vides, on renvoi une erreur 
         if (empty($jsonBis['user_id']) || empty($jsonBis['product_id'])) {
 

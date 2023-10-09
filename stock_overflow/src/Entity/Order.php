@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enums\OrderStatus;
 use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,6 +36,13 @@ class Order
      */
     private ?int $quantity = null;
 
+    #[ORM\Column(type: "string", enumType: OrderStatus::class)]
+    /**
+     * 
+     *@Groups({"get_orders"})
+     */
+    private OrderStatus $status;
+    
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     /**
@@ -77,6 +85,23 @@ class Order
     {
         $this->quantity = $quantity;
 
+        return $this;
+    }
+
+    public function __construct()
+    {
+        $this->status = OrderStatus::Processing;
+    }
+    public function getStatus() : ?OrderStatus
+    {
+        
+        return $this->status;
+    }
+
+    public function setStatus(?OrderStatus $status) : static
+    {
+        $this->status = $status;
+        
         return $this;
     }
 
