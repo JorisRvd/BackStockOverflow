@@ -15,13 +15,11 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-<<<<<<< Updated upstream
-=======
+
     /**
      *  @Groups({"get_products"})
      *  @Groups({"get_category"})
      */
->>>>>>> Stashed changes
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -52,7 +50,7 @@ class Product
      */
     private ?bool $is_active = null;
 
-    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\ManyToOne(inversedBy: 'products', cascade:['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     /**
      *  @Groups({"get_products"})
