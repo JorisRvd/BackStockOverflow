@@ -60,6 +60,6 @@ class RegistrationController extends AbstractController
      return new JsonResponse([
        'success_message' => 'Thank you for registering'
      ]);
-     // re
+     
     }
 }

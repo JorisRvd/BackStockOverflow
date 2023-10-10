@@ -18,14 +18,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     /**
-     *   @Groups({"get_products", "get_orders"})
+     *   @Groups({"get_products", "get_orders", "get_user"})
      */
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    /**
+     *   @Groups({"get_user"})
+     */
     private ?string $email = null;
 
     #[ORM\Column]
+    /**
+     *   @Groups({"get_user"})
+     */
     private array $roles = [];
 
     /**
@@ -36,13 +42,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     /**
-     *   @Groups({"get_orders"})
+     *   @Groups({"get_orders", "get_user"})
      */
     private ?string $first_name = null;
 
     #[ORM\Column(length: 255)]
     /**
-     *   @Groups({"get_orders"})
+     *   @Groups({"get_orders", "get_user"})
      */
     private ?string $last_name = null;
 
