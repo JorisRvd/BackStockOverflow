@@ -29,6 +29,7 @@
         "symfony/runtime": "5.4.*",
         "symfony/security-bundle": "5.4.*",
         "symfony/serializer": "5.4.*",
+        "symfony/twig-bundle": "5.4.*",
         "symfony/validator": "5.4.*",
         "symfony/yaml": "5.4.*"
     },
@@ -71,6 +72,8 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
+            "export APP_ENV=prod",
+            "composer install --no-dev --optimize-autoloader",
             "@auto-scripts"
         ],
         "compile": [
