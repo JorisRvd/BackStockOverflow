@@ -73,6 +73,7 @@
         },
         "post-install-cmd": [
             "export APP_ENV=prod ",
+            "composer install --no-dev --optimize-autoloader",
             "@auto-scripts"
         ],
         "compile": [
