@@ -72,6 +72,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
+            "export APP_ENV=prod ",
             "@auto-scripts"
         ],
         "compile": [
