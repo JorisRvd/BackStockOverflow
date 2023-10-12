@@ -69,7 +69,6 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd",
             "assets:install --no-cleanup %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
