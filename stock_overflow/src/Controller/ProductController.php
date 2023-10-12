@@ -23,6 +23,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProductController extends AbstractController
 {
 
+    #[Route('/', name: 'product_index', methods: ['GET'])]
+    public function index(ProductRepository $productRepository): Response
+    {
+        return $this->json($productRepository->findAll(), 200, [], [
+            "groups" => "get_products"
+        ]);
+    }
+    
     #[Route('/new-products', name: 'product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator, ProductCategoryRepository $productCategoryRepository): Response
     {

@@ -48,6 +48,13 @@ class Product
      *  @Groups({"get_products"})
      *  @Groups({"get_category"})
      */
+    private ?int $price = null;
+
+    #[ORM\Column]
+    /**
+     *  @Groups({"get_products"})
+     *  @Groups({"get_category"})
+     */
     private ?bool $is_active = null;
 
     #[ORM\ManyToOne(inversedBy: 'products', cascade:['persist'])]
@@ -106,6 +113,18 @@ class Product
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getPrice(): ?int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }
