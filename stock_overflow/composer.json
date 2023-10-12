@@ -69,7 +69,7 @@
     },
     "scripts": {
         "auto-scripts": {
-            "assets:install --no-cleanup %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
