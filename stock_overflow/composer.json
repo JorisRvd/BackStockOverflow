@@ -72,7 +72,6 @@
             "assets:install --no-cleanup %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
-            "composer install --no-dev --optimize-autoloader",
             "@auto-scripts"
         ],
         "compile": [
