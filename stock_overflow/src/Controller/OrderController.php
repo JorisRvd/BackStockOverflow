@@ -27,6 +27,7 @@ class OrderController extends AbstractController
     #[Route('/', name: 'order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
+        // dd($orderRepository->findAll());
         return $this->json($orderRepository->findAll(), 200, [], [
             "groups" => "get_orders"
         ]);

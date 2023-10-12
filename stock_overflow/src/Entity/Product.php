@@ -46,7 +46,7 @@ class Product
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
-     *  @Groups({"get_category"})
+     *  @Groups({"get_category", "get_orders"})
      */
     private ?int $price = null;
 

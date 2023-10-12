@@ -23,6 +23,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ProductCategoryController extends AbstractController
 {
 
+    #[Route('/', name: 'app_product_category_index', methods: ['GET'])]
+    public function index(ProductCategoryRepository $productCategoryRepository): Response
+    {
+        return $this->json($productCategoryRepository->findAll(), 200, [], [
+            "groups" => "get_category"
+        ]);
+    }
+
     #[Route('/new', name: 'app_product_category_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator): Response
     {
