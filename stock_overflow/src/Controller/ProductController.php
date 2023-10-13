@@ -26,7 +26,11 @@ class ProductController extends AbstractController
     #[Route('/', name: 'product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
-        return $this->json($productRepository->findAll(), 200, [], [
+        return $this->json($productRepository->findAll(), 200, [
+            'Access-Control-Allow-Origin'=>'*',
+            'Content-Type'=> 'application/json'
+        ],
+        [
             "groups" => "get_products"
         ]);
     }
