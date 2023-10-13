@@ -74,4 +74,14 @@ class UserController extends AbstractController
             'success_message' => 'User supprimé.'
         ]);
     }
+    
+    #[Route('/users/all', name: 'user_all', methods: ['GET'])]
+    public function getAllUsers(UserRepository $userRepository): Response
+    {
+        $products = $userRepository->findAll();
+    
+        return $this->json($products, 200, [], [
+            'groups' => 'get_user'
+        ]);
+    }
 }

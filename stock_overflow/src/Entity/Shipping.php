@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 #[ORM\Entity(repositoryClass: ShippingRepository::class)]
 class Shipping
@@ -17,6 +19,9 @@ class Shipping
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'shippings')]

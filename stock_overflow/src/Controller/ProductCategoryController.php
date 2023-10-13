@@ -116,4 +116,14 @@ class ProductCategoryController extends AbstractController
             'success_message' => 'Catégorie de produit supprimé.'
         ]);
     }
+
+    #[Route('/productcat/all', name: 'productcat_all', methods: ['GET'])]
+    public function getAllUsers(ProductCategoryRepository $productCategoryRepository): Response
+    {
+        $productsCategory = $productCategoryRepository->findAll();
+    
+        return $this->json($productsCategory, 200, [], [
+            'groups' => 'get_category'
+        ]);
+    }
 }

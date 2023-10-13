@@ -169,4 +169,14 @@ class OrderController extends AbstractController
             'message' => 'Commande supprimée.'
         ]);
     }
+
+    #[Route('/orders/all', name: 'orders_all', methods: ['GET'])]
+    public function getAllProducts(OrderRepository $orderRepository): Response
+    {
+        $orders = $orderRepository->findAll();
+    
+        return $this->json($orders, 200, [], [
+            'groups' => 'get_orders'
+        ]);
+    }
 }

@@ -6,6 +6,7 @@ use App\Repository\ClientsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientsRepository::class)]
 class Clients
@@ -16,21 +17,39 @@ class Clients
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?string $company = null;
 
     #[ORM\Column(length: 255)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?string $address = null;
 
     #[ORM\Column]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?int $zip_code = null;
 
     #[ORM\Column(length: 255)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?string $phone = null;
 
     #[ORM\OneToMany(mappedBy: 'clients', targetEntity: Shipping::class)]
+    /**
+     *@Groups({"get_client"})
+     */
     private Collection $shippings;
 
     public function __construct()

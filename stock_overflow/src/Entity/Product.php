@@ -25,7 +25,7 @@ class Product
     #[ORM\Column(length: 255)]
     /**
      *  @Groups({"get_category"})
-     *  @Groups({"get_products", "get_orders"})
+     *  @Groups({"get_products", "get_orders", "get_client})
      */
     private ?string $name = null;
 

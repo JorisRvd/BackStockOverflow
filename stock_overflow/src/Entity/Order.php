@@ -24,7 +24,6 @@ class Order
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     /**
-     * 
      *@Groups({"get_orders"})
      */
     private ?\DateTimeInterface $date = null;

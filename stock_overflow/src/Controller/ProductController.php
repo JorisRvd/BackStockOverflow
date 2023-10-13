@@ -131,4 +131,14 @@ class ProductController extends AbstractController
             'success_message' => 'Produit supprimé.'
         ]);
     }
+    
+    #[Route('/products/all', name: 'product_all', methods: ['GET'])]
+    public function getAllProducts(ProductRepository $productRepository): Response
+    {
+        $products = $productRepository->findAll();
+    
+        return $this->json($products, 200, [], [
+            'groups' => 'get_products'
+        ]);
+    }
 }

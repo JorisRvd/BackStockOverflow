@@ -20,6 +20,9 @@ class ShippingItem
 
     #[ORM\ManyToOne(inversedBy: 'shippingItems')]
     #[ORM\JoinColumn(nullable: false)]
+    /**
+     *@Groups({"get_client"})
+     */
     private ?Product $product = null;
 
     #[ORM\ManyToMany(targetEntity: Shipping::class, mappedBy: 'shipping_item')]

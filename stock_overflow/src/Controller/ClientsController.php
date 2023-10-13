@@ -23,7 +23,9 @@ class ClientsController extends AbstractController
     #[Route('/', name: 'clients_index', methods: ['GET'])]
     public function index(ClientsRepository $clientsRepository): Response
     {
-        return $this->json($clientsRepository->findAll());
+        return $this->json($clientsRepository->findAll(), 200, [], [
+            'groups' => 'get_client'
+        ]);
     }
 
     #[Route('/new', name: 'clients_new', methods: ['POST'])]
