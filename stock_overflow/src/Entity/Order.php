@@ -89,7 +89,7 @@ class Order
 
     public function __construct()
     {
-        $this->status = OrderStatus::Processing;
+        $this->status = OrderStatus::En_attente;
     }
     public function getStatus() : ?OrderStatus
     {
