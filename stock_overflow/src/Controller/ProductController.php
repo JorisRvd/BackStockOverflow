@@ -3,8 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
-use App\Entity\ProductCategory;
-use App\Form\ProductType;
+
 use App\Repository\ProductCategoryRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,12 +17,25 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Attributes as OA;
+
 
 #[Route('/product')]
+
 class ProductController extends AbstractController
 {
 
     #[Route('/', name: 'product_index', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the list of the products',
+        content: new OA\JsonContent(
+            type: 'Json',
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['get_products']))
+        )
+    )]
     public function index(ProductRepository $productRepository): Response
     {
         return $this->json($productRepository->findAll(), 200, [
@@ -36,6 +48,20 @@ class ProductController extends AbstractController
     }
     
     #[Route('/new-products', name: 'product_new', methods: ['GET', 'POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the new product',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['get_products']))
+        )
+    )]
+    #[OA\Parameter(
+        name: 'product_infos',
+        in: 'POST',
+        description: 'The field used to create a new product',
+        schema: new OA\Schema(type: 'array')
+    )]
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator, ProductCategoryRepository $productCategoryRepository): Response
     {
         $jsonContent = $request->getContent();

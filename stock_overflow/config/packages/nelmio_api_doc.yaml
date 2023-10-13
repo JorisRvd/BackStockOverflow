@@ -1,0 +1,10 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Stock'Overflow - L'outil qu'il vous faut
+            description: Une API de gestion de stock incroyable !!!
+            version: 1.0.0
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/product
