@@ -60,7 +60,7 @@ class Product
     #[ORM\ManyToOne(inversedBy: 'products', cascade:['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     /**
-     *  @Groups({"get_products"})
+     *  @Groups({"get_products","get_orders"})
      */
     private ?ProductCategory $product_category = null;
 
