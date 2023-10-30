@@ -7,6 +7,6 @@ enum OrderStatus: string {
     
     case En_attente = 'En attente';
     case Validé = 'Validée';
-    case Annulé = 'Annulé';
+    case Annulé = 'Annulée';
 
 }
