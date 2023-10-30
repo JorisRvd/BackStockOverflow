@@ -16,6 +16,7 @@ class ProductCategory
     #[ORM\GeneratedValue]
     #[ORM\Column]
     /**
+     *  @Groups({"get_products"})
      * @Groups({"get_category"})
      */
     private ?int $id = null;
