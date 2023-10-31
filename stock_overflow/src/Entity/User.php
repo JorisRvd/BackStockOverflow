@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     /**
-     *   @Groups({"get_user"})
+     *   @Groups({"get_user", "get_shippings"})
      */
     private ?string $email = null;
 
@@ -42,13 +42,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     /**
-     *   @Groups({"get_orders", "get_user"})
+     *   @Groups({"get_orders", "get_user", "get_shippings"})
      */
     private ?string $first_name = null;
 
     #[ORM\Column(length: 255)]
     /**
-     *   @Groups({"get_orders", "get_user"})
+     *   @Groups({"get_orders", "get_user", "get_shippings"})
      */
     private ?string $last_name = null;
 
