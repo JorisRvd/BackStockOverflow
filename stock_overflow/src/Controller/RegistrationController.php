@@ -14,10 +14,40 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register', methods: ['POST'])]
+    /**
+      * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"email": "test@test.fr", "first_name": "Test", "last_name": "Test"}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=201,
+     *     description="Créé un utilisateur",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={"message": "Thank you for registering"}
+     *     )     
+     * )
+     *  @OA\Tag(name="Users")
+     * ) 
+     *
+     * @param Request $request
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param SerializerInterface $serializer
+     * @param ValidatorInterface $validator
+     * @param ManagerRegistry $doctrine
+     * @return Response
+     */
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, SerializerInterface $serializer, ValidatorInterface $validator, ManagerRegistry $doctrine): Response
     {
      // Récupérer le contenu JSON

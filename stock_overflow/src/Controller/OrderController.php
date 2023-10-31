@@ -6,7 +6,6 @@ use App\Entity\Order;
 use App\Enums\OrderStatus;
 use App\Repository\UserRepository;
 use App\Repository\OrderRepository;
-use App\Repository\ProductRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,12 +18,31 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 #[Route('/order')]
 class OrderController extends AbstractController
 {
     
     #[Route('/', name: 'order_index', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne la liste des commandes",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_orders"})),
+     *        example={{"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 150, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}},
+     *                  {"id": 2, "date": "2023-10-13T00:00:00+00:00", "quantity": 150, "status": "Validée", "product": { "name": "World of Warcraft", "price": 35}, "user": { "id": 2, "first_name": "Alexandre", "last_name": "Rousseau"}}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Orders")
+     * )
+     * @param OrderRepository $orderRepository
+     * @return Response
+     */
     public function index(OrderRepository $orderRepository): Response
     {
         return $this->json($orderRepository->findAll(), 200, [], [
@@ -33,6 +51,35 @@ class OrderController extends AbstractController
     }
 
     #[Route('/new', name: 'order_new', methods: ['POST'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"date":"2023-10-31", "quantity": 100, "product": 1, "user_id": 1, "status": "En_attente"}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=201,
+     *     description="Créé et retourne une commande",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        example={"message": "Commande créée", "data": {"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 100, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}},          
+     *     )
+     * )       
+     * @OA\Tag(name="Orders")
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param ManagerRegistry $doctrine
+     * @param ValidatorInterface $validator
+     * @param UserRepository $userRepository
+     * @param ProductRepository $productRepository
+     * @return Response
+     */
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator, UserRepository $userRepository, ProductRepository $productRepository): Response
     {
         $json = $request->getContent();
@@ -88,6 +135,23 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'order_show', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Met à jour une commande",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        example={"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 150, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Orders")
+     * )
+     *
+     * @param Order $order
+     * @param integer $id
+     * @return Response
+     */
     public function show(Order $order, int $id): Response
     {
         if(!$order) {
@@ -102,6 +166,35 @@ class OrderController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: 'order_edit', methods: ['PUT', 'PATCH'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"date":"2023-10-31", "quantity": 100, "product": 1, "user_id": 1, "status": "Validée"}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=201,
+     *     description="Met à jour une commande",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        example={"message": "Commande mise à jour", "data": {"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 100, "status": "Validée", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}},          
+     *     )
+     * )       
+     * @OA\Tag(name="Orders")
+     *
+     * @param Request $request
+     * @param integer $id
+     * @param EntityManagerInterface $entityManager
+     * @param ManagerRegistry $doctrine
+     * @param SerializerInterface $serializer
+     * @param ProductRepository $productRepository
+     * @param UserRepository $userRepository
+     * @return Response
+     */
     public function edit(Request $request, int $id, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, SerializerInterface $serializer,ProductRepository $productRepository, UserRepository $userRepository): Response
     {
         $entityManager = $doctrine->getManager();
@@ -153,6 +246,23 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'order_delete', methods: ['DELETE'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Supprime une commande",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        example={"message": "Commande supprimée."}
+     *     )     
+     * )
+     *  @OA\Tag(name="Orders")
+     * )
+     *
+     * @param ManagerRegistry $doctrine
+     * @param integer $id
+     * @return Response
+     */
     public function delete(ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
@@ -170,13 +280,14 @@ class OrderController extends AbstractController
         ]);
     }
 
-    #[Route('/orders/all', name: 'orders_all', methods: ['GET'])]
-    public function getAllProducts(OrderRepository $orderRepository): Response
-    {
-        $orders = $orderRepository->findAll();
+    // #[Route('/orders/all', name: 'orders_all', methods: ['GET'])]
+    // public function getAllProducts(OrderRepository $orderRepository): Response
+    // {
+    //     $orders = $orderRepository->findAll();
     
-        return $this->json($orders, 200, [], [
-            'groups' => 'get_orders'
-        ]);
-    }
+    //     return $this->json($orders, 200, [], [
+    //         'groups' => 'get_orders'
+    //     ]);
+    // }
+    
 }

@@ -16,11 +16,30 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 #[Route('/clients')]
 class ClientsController extends AbstractController
 {
     #[Route('/', name: 'clients_index', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne la liste des clients",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Clients::class)),
+     *        example={{"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"},
+     *                  {"id": 2, "company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "city": "La Rochelle", "phone": "0546410000"}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Clients")
+     *
+     * @param ClientsRepository $clientsRepository
+     * @return Response
+     */
     public function index(ClientsRepository $clientsRepository): Response
     {
         return $this->json($clientsRepository->findAll(), 200, [], [
@@ -29,6 +48,33 @@ class ClientsController extends AbstractController
     }
 
     #[Route('/new', name: 'clients_new', methods: ['POST'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=201,
+     *     description="Créé et retourne un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Clients::class)),
+     *             example={"message": "Client créé", "data": {"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}}
+     *     )
+     * )           
+     * @OA\Tag(name="Clients")          
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param ManagerRegistry $doctrine
+     * @param ValidatorInterface $validator
+     * @return Response
+     */
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator): Response
     {
 
@@ -67,6 +113,22 @@ class ClientsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'clients_show', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *        example={"id": 2, "company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "city": "La Rochelle", "phone": "0546410000"}
+     *     )     
+     * )
+     *  @OA\Tag(name="Clients")
+     *
+     * @param Clients $client
+     * @param integer $id
+     * @return Response
+     */
     public function show(Clients $client, int $id): Response
     {
         if(!$client) {
@@ -78,6 +140,33 @@ class ClientsController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: 'clients_edit', methods: ['PUT', 'PATCH'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=200,
+     *     description="Modifie un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *             example={"message": "Le client à été mis à jour", "data": {"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}}
+     *     )
+     * )           
+     * @OA\Tag(name="Clients") 
+     *
+     * @param Request $request
+     * @param integer $id
+     * @param EntityManagerInterface $entityManager
+     * @param ManagerRegistry $doctrine
+     * @param SerializerInterface $serializer
+     * @return Response
+     */
     public function edit(Request $request, int $id, EntityManagerInterface $entityManager, ManagerRegistry $doctrine, SerializerInterface $serializer): Response
     {
         $entityManager = $doctrine->getManager();
@@ -101,6 +190,22 @@ class ClientsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'clients_delete', methods: ['DELETE'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Supprime un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *        example={"message": "Client supprimé."}
+     *     )     
+     * )
+     *  @OA\Tag(name="Clients")
+     *
+     * @param ManagerRegistry $doctrine
+     * @param integer $id
+     * @return Response
+     */
     public function delete(ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
@@ -114,7 +219,8 @@ class ClientsController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse([
-            'message' => 'Client supprimée.'
+            'message' => 'Client supprimé.'
         ]);
     }
+    
 }
