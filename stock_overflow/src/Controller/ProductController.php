@@ -34,8 +34,7 @@ class ProductController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des produits",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        type="string",
      *        example={{"id":15, "name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": {"name": "Xbox"}},
      *          {"id":56, "name": "EA FC 24", "description": "Le dernier jeu de football", "price": 69, "quantity":67, "is_active": true, "product_category": {"name": "Playstation 5"}}}
      *     )     
@@ -71,8 +70,7 @@ class ProductController extends AbstractController
      *     response=201,
      *     description="Créé un produit et le retourne",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        type="string",
      *        example={"id":15, "name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": {"name": "Xbox"}}
      *     )     
      * )
@@ -127,8 +125,7 @@ class ProductController extends AbstractController
      *     response=200,
      *     description="Renvoi un produit",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        type="string",
      *        example={"id": 15,"name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": 1}
      *     )     
      * )
@@ -165,8 +162,7 @@ class ProductController extends AbstractController
      *     response=200,
      *     description="Modifie un produit",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        type="string",
      *        example={"success_message": "Produit mis à jour."}
      *     )     
      * )
@@ -205,8 +201,7 @@ class ProductController extends AbstractController
      *     response=200,
      *     description="Supprime un produit",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        type="string",
      *        example={"success_message":"Produit supprimé"}
      *     )     
      * )

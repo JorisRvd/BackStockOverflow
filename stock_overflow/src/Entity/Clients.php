@@ -55,6 +55,12 @@ class Clients
      */
     private Collection $shippings;
 
+    #[ORM\Column(length: 255)]
+    /**
+     *@Groups({"get_client"})
+     */
+    private ?string $city = null;
+
     public function __construct()
     {
         $this->shippings = new ArrayCollection();
@@ -151,6 +157,18 @@ class Clients
                 $shipping->setClients(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): static
+    {
+        $this->city = $city;
 
         return $this;
     }

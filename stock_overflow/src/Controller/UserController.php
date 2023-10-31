@@ -30,8 +30,7 @@ class UserController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des utilisateurs",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class, groups={"get_user"})),
+     *        type="string",
      *        example={"id": 2, "email": "alex@test.fr", "roles": {"ROLE_ADMIN", "ROLE_USER"}, "first_name": "Alexandre", "last_name": "Rousseau"}
      *     )     
      * )
@@ -68,8 +67,7 @@ class UserController extends AbstractController
      *     response=200,
      *     description="Modifie un utilisateur",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class, groups={"get_user"})),
+     *        type="string",
      *        example={"id": 2, "email": "alex@test.fr", "roles": {"ROLE_USER"}, "first_name": "Alexandre", "last_name": "Rousseau"}
      *     )     
      * )
@@ -109,8 +107,7 @@ class UserController extends AbstractController
      *     response=200,
      *     description="Supprime une commande",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class, groups={"get_user"})),
+     *        type="string",
      *        example={"message": "User supprimé."}
      *     )     
      * )
@@ -144,8 +141,7 @@ class UserController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des commandes",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class, groups={"get_user"})),
+     *        type="string",
      *        example={{"id": 1, "email": "gael@test.com", "roles": {"ROLE_USER"}, "first_name": "Gaël", "last_name": "COUPÉ"},
      *                {"id": 2, "email": "alex@test.fr", "roles": {"ROLE_ADMIN", "ROLE_USER"}, "first_name": "Alexandre", "last_name": "Rousseau"},
      *                {"id": 8, "email": "alex@alex.fr", "roles": {"ROLE_ADMIN", "ROLE_USER"}, "first_name": "Alex", "last_name": "Rousseau"}}

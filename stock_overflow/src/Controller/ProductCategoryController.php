@@ -28,8 +28,7 @@ class ProductCategoryController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des categories",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=ProductCategory::class, groups={"get_products"})),
+     *        type="string",
      *        example={{"id":1, "name": "Xbox Series"},{"id":2, "name":"Playstation 5"}}
      *     )     
      * )
@@ -57,11 +56,10 @@ class ProductCategoryController extends AbstractController
      *         )
      *  )
      * @OA\Response(
-     *     response=200,
+     *     response=201,
      *     description="Créé et retourne la catégorie",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=ProductCategory::class, groups={"get_products"})),
+     *        type="string",
      *        example={"id":3, "name": "Game Boy Color"}
      *     )     
      * )       
@@ -112,8 +110,7 @@ class ProductCategoryController extends AbstractController
      *     response=200,
      *     description="Renvoi une catégorie",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=ProductCategory::class, groups={"get_products"})),
+     *        type="string",
      *        example={"id":3, "name":"Nintendo Switch"}
      *     )     
      * )
@@ -150,8 +147,7 @@ class ProductCategoryController extends AbstractController
      *     response=200,
      *     description="Modifie une catégorie",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=ProductCategory::class, groups={"get_products"})),
+     *        type="string",
      *        example={"success_message": "Catégorie mise à jour."}
      *     )     
      * )       
@@ -191,8 +187,7 @@ class ProductCategoryController extends AbstractController
      *     response=200,
      *     description="Supprime une catégorie",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=ProductCategory::class, groups={"get_products"})),
+     *        type="string",
      *        example={"success_message":"Produit supprimé"}
      *     )     
      * )

@@ -32,8 +32,7 @@ class OrderController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des commandes",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_orders"})),
+     *        type="string",
      *        example={{"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 150, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}},
      *                  {"id": 2, "date": "2023-10-13T00:00:00+00:00", "quantity": 150, "status": "Validée", "product": { "name": "World of Warcraft", "price": 35}, "user": { "id": 2, "first_name": "Alexandre", "last_name": "Rousseau"}}}
      *     )     
@@ -64,8 +63,7 @@ class OrderController extends AbstractController
      *     response=201,
      *     description="Créé et retourne une commande",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        type="string",
      *        example={"message": "Commande créée", "data": {"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 100, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}},          
      *     )
      * )       
@@ -138,10 +136,9 @@ class OrderController extends AbstractController
     /**
      * @OA\Response(
      *     response=200,
-     *     description="Met à jour une commande",
+     *     description="Retourne une commande",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        type="string",
      *        example={"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 150, "status": "En_attente", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}
      *     )     
      * )
@@ -176,11 +173,10 @@ class OrderController extends AbstractController
      *         )
      *  )
      * @OA\Response(
-     *     response=201,
+     *     response=200,
      *     description="Met à jour une commande",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        type="string",
      *        example={"message": "Commande mise à jour", "data": {"id": 1, "date": "2023-10-12T00:00:00+00:00", "quantity": 100, "status": "Validée", "product": {"name": "Resident Evil Village", "price": 79},"user": { "id": 1, "first_name": "Gaël", "last_name": "Coupé"}}},          
      *     )
      * )       
@@ -251,8 +247,7 @@ class OrderController extends AbstractController
      *     response=200,
      *     description="Supprime une commande",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Order::class, groups={"get_products"})),
+     *        type="string",
      *        example={"message": "Commande supprimée."}
      *     )     
      * )

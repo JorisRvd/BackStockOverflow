@@ -29,8 +29,7 @@ class ClientsController extends AbstractController
      *     response=200,
      *     description="Retourne la liste des clients",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Clients::class)),
+     *        type="string",
      *        example={{"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"},
      *                  {"id": 2, "company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "city": "La Rochelle", "phone": "0546410000"}}
      *     )     
@@ -61,8 +60,7 @@ class ClientsController extends AbstractController
      *     response=201,
      *     description="Créé et retourne un client",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Clients::class)),
+     *        type="string",
      *             example={"message": "Client créé", "data": {"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}}
      *     )
      * )           
@@ -118,8 +116,7 @@ class ClientsController extends AbstractController
      *     response=200,
      *     description="Retourne un client",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *        type="string",
      *        example={"id": 2, "company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "city": "La Rochelle", "phone": "0546410000"}
      *     )     
      * )
@@ -153,8 +150,7 @@ class ClientsController extends AbstractController
      *     response=200,
      *     description="Modifie un client",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *        type="string",
      *             example={"message": "Le client à été mis à jour", "data": {"id":"1", "company": "MaCompta.fr", "email": "paie@macompta.fr", "address": "4 rue Louis Tardy", "zip_code": 17140, "city": "Lagord", "phone":"0546451280"}}
      *     )
      * )           
@@ -195,8 +191,7 @@ class ClientsController extends AbstractController
      *     response=200,
      *     description="Supprime un client",
      *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Clients::class, groups={"get_clients"})),
+     *        type="string",
      *        example={"message": "Client supprimé."}
      *     )     
      * )
