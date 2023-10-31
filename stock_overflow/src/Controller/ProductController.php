@@ -3,8 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
-use App\Entity\ProductCategory;
-use App\Form\ProductType;
+
 use App\Repository\ProductCategoryRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,12 +17,34 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
+
 
 #[Route('/product')]
+
 class ProductController extends AbstractController
 {
 
     #[Route('/', name: 'product_index', methods: ['GET'])]
+    /**
+     * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne la liste des produits",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        example={{"id":15, "name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": {"name": "Xbox"}},
+     *          {"id":56, "name": "EA FC 24", "description": "Le dernier jeu de football", "price": 69, "quantity":67, "is_active": true, "product_category": {"name": "Playstation 5"}}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Products")
+     * )
+     * @param ProductRepository $productRepository
+     * @return Response
+     */
     public function index(ProductRepository $productRepository): Response
     {
         return $this->json($productRepository->findAll(), 200, [
@@ -35,7 +56,36 @@ class ProductController extends AbstractController
         ]);
     }
     
-    #[Route('/new-products', name: 'product_new', methods: ['GET', 'POST'])]
+    #[Route('/new-products', name: 'product_new', methods: ['POST'])]
+    /**
+     *
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 example={"name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": 1}
+     *             )
+     *         )
+     *     )
+     * @OA\Response(
+     *     response=201,
+     *     description="Créé un produit et le retourne",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        example={"id":15, "name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": {"name": "Xbox"}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Products")
+     * )
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param ManagerRegistry $doctrine
+     * @param ValidatorInterface $validator
+     * @param ProductCategoryRepository $productCategoryRepository
+     * @return Response
+     */
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator, ProductCategoryRepository $productCategoryRepository): Response
     {
         $jsonContent = $request->getContent();
@@ -72,7 +122,21 @@ class ProductController extends AbstractController
         
     }
 
-
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Renvoi un produit",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        example={"id": 15,"name": "Forza Horizon 5", "description": "Un jeu de course incroyable au Mexique", "price": 69, "quantity":200, "is_active": true, "product_category": 1}
+     *     )     
+     * )
+     *  @OA\Tag(name="Products")
+     * )
+     * @param ProductRepository $productRepository
+     * @return Response
+     */
     #[Route('/{id}', name: 'product_show', methods: ['GET'])]
     public function getProduct(Product $product, int $id): Response
     {
@@ -87,7 +151,30 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/edit/{id}', name: 'product_edit', methods: ['GET', 'POST'])]
+    /**
+     * 
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 example={"name": "EA FC 24", "description": "Le dernier jeu de football", "price": 69, "quantity":67, "is_active": true, "product_category": 1}
+     *             )
+     *         )
+     *     )
+     * @OA\Response(
+     *     response=200,
+     *     description="Modifie un produit",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        example={"success_message": "Produit mis à jour."}
+     *     )     
+     * )
+     *  @OA\Tag(name="Products")
+     * )
+     * 
+     */
+    #[Route('/edit/{id}', name: 'product_edit', methods: ['PUT', 'PATCH'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, int $id, ManagerRegistry $doctrine, SerializerInterface $serializer, ProductCategoryRepository $productCategoryRepository): Response
     {
         $entityManager = $doctrine->getManager();
@@ -113,7 +200,20 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'product_delete', methods: ['POST'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Supprime un produit",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class, groups={"get_products"})),
+     *        example={"success_message":"Produit supprimé"}
+     *     )     
+     * )
+     *  @OA\Tag(name="Products")
+     * )
+     */
+    #[Route('/{id}', name: 'product_delete', methods: ['DELETE'])]
     public function delete(ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
@@ -132,13 +232,13 @@ class ProductController extends AbstractController
         ]);
     }
     
-    #[Route('/products/all', name: 'product_all', methods: ['GET'])]
-    public function getAllProducts(ProductRepository $productRepository): Response
-    {
-        $products = $productRepository->findAll();
+    // #[Route('/products/all', name: 'product_all', methods: ['GET'])]
+    // public function getAllProducts(ProductRepository $productRepository): Response
+    // {
+    //     $products = $productRepository->findAll();
     
-        return $this->json($products, 200, [], [
-            'groups' => 'get_products'
-        ]);
-    }
+    //     return $this->json($products, 200, [], [
+    //         'groups' => 'get_products'
+    //     ]);
+    // }
 }

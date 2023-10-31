@@ -1,0 +1,59 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Stock'Overflow - L'outil qu'il vous faut
+            description: Une API de gestion de stock incroyable !!!
+            version: 1.0.0
+        paths:
+            /api/login:
+                post:
+                    tags:
+                        - Token
+                    operationId: postCredentialsItem
+                    summary: Permet de récupérer les infos des users dans le token.
+                    requestBody:
+                        description : Créé un nouveau token JWT
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/Credentials'
+                    responses:
+                        '200':
+                            description: Récupère le JWT
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Token'
+        components:
+            schemas:
+                Token:
+                    type: object
+                    properties:
+                        token:
+                            type: string
+                            readOnly: true
+                Credentials:
+                    type: object
+                    properties:
+                        username:
+                            type: string
+                            default: test@stockOverflow.fr
+                        password:
+                            type: string
+                            default: password
+            securitySchemes:
+                bearerAuth:
+                    type: apiKey
+                    in: header
+                    name: Authorization # or another header name
+        security:
+            - bearerAuth: []
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/product
+            - ^/order
+            - ^/clients
+            - ^/user
+            - ^/shipping
+            - ^/register
