@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Order;
 use App\Enums\OrderStatus;
+use OpenApi\Annotations as OA;
 use App\Repository\UserRepository;
 use App\Repository\OrderRepository;
-use DateTime;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,9 +22,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use OpenApi\Annotations as OA;
 
 #[Route('/order')]
 class OrderController extends AbstractController
@@ -102,6 +103,9 @@ class OrderController extends AbstractController
         }
 
         $errors = $validator->validate($newOrder);
+        if (count($errors) > 0) {
+            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
         // Si les champs user_id et/ou product_id sont vides, on renvoi une erreur 
         if (empty($jsonBis['user_id']) || empty($jsonBis['product_id'])) {
 
@@ -113,9 +117,7 @@ class OrderController extends AbstractController
             $product = $productRepository->find($jsonBis['product_id']);
             $newOrder->setUser($user);
             $newOrder->setProduct($product);
-
         }
-      
         $entityManager = $doctrine->getManager();
         $entityManager->persist($newOrder);
         $entityManager->flush();

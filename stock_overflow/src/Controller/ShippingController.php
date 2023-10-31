@@ -24,12 +24,78 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 #[Route('/shipping')]
 class ShippingController extends AbstractController
 {
 
-    #[Route('/new', name: '= shipping_new', methods: ['GET', 'POST'])]
+    #[Route('/', name: 'shipping_index', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne la liste des expéditions",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={{"date": "2023-10-31T14:04:10+00:00", "clients": {"company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "phone": "0546410000"},
+     *                 "user": { "email": "test@stockOverflow.fr", "first_name": "Test", "last_name": "Test"}, 
+     *                 "product": {{"name": "Starfield", "description": "A wonderful way to discover space and beyond", "quantity": 114, "price": 50, "is_active": true, "product_category": { "name": "XBOX S"}},
+     *                 {"name": "Pokemon Bleu", "description": "Attrappez les tous", "quantity": 5, "price": 8, "is_active": true, "product_category": {"name": "Game Boy Color"}}}},
+     *                 {"date": "2023-10-31T14:04:10+00:00", "clients": {"company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "phone": "0546410000"},
+     *                 "user": { "email": "test@stockOverflow.fr", "first_name": "Test", "last_name": "Test"}, 
+     *                 "product": {{"name": "Super Smash Bros. Ultimate", "description": "Un jeu de combat qui rassemble les personnages emblématiques de Nintendo.", "quantity": 9, "price": 49, "is_active": true, "product_category": { "name": "Nintendo Switch"}},
+     *                 {"name": "Cyberpunk 2077", "description": "Un RPG futuriste se déroulant dans un monde ouvert, plein de cybernétique et d'intrigue.", "quantity": 5, "price": 35, "is_active": true, "product_category": {"name": "PS5"}}}}}
+     *     )     
+     * )
+     *  @OA\Tag(name="Shippings")
+     * )
+     *
+     * @param ShippingRepository $shippingRepository
+     * @return Response
+     */
+    public function index(ShippingRepository $shippingRepository): Response
+    {
+        return $this->json($shippingRepository->findAll(), 200, [], [
+            "groups" => "get_shippings"
+        ]);
+    }
+
+
+    #[Route('/new', name: '= shipping_new', methods: ['POST'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"shipping": {"clients" : 1, "user" : 1}, "shippingProducts" : {{"product_id" : 1, "quantity" : 20},{"product_id" : 15,"quantity" : 5}}}
+     *           )
+     *         )
+     *  )
+     * @OA\Response(
+     *     response=201,
+     *     description="Créé et retourne une expédition",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={"date": "2023-10-31T14:04:10+00:00", "clients": {"company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "phone": "0546410000"},
+     *                 "user": { "email": "test@stockOverflow.fr", "first_name": "Test", "last_name": "Test"}, 
+     *                 "product": {{"name": "Starfield", "description": "A wonderful way to discover space and beyond", "quantity": 114, "price": 50, "is_active": true, "product_category": { "name": "XBOX S"}},
+     *                 {"name": "Ghost of Tsushima", "description": "Un jeu d'action-aventure qui vous plonge dans le Japon féodal.", "quantity": 7, "price": 70, "is_active": true, "product_category": {"name": "PS5"}}}},
+     *     )
+     * ) 
+     *  @OA\Tag(name="Shippings")
+
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param ValidatorInterface $validator
+     * @param UserRepository $userRepository
+     * @param ClientsRepository $clientRepository
+     * @param ProductRepository $productRepository
+     * @return Response
+     */
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -91,6 +157,24 @@ class ShippingController extends AbstractController
     }
 
     #[Route('/{id}', name: '= shipping_show', methods: ['GET'])]
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne une expédition",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={"date": "2023-10-31T14:04:10+00:00", "clients": {"company": "Micromania", "email": "accueil@micromania.fr", "address": "4 rue de Mario", "zip_code": 17000, "phone": "0546410000"},
+     *                 "user": { "email": "test@stockOverflow.fr", "first_name": "Test", "last_name": "Test"}, 
+     *                 "product": {{"name": "Starfield", "description": "A wonderful way to discover space and beyond", "quantity": 114, "price": 50, "is_active": true, "product_category": { "name": "XBOX S"}},
+     *                 {"name": "Ghost of Tsushima", "description": "Un jeu d'action-aventure qui vous plonge dans le Japon féodal.", "quantity": 7, "price": 70, "is_active": true, "product_category": {"name": "PS5"}}}},
+     *     )
+     * ) 
+     *  @OA\Tag(name="Shippings")
+     *
+     * @param Shipping $shipping
+     * @param integer $id
+     * @return Response
+     */
     public function show(Shipping $shipping, int $id): Response
     {
         if (!$shipping) {
@@ -108,7 +192,38 @@ class ShippingController extends AbstractController
         );
     }
 
-    #[Route('/edit/{id}', name: '= shipping_edit', methods: ['GET', 'POST'])]
+    #[Route('/edit/{id}', name: '= shipping_edit', methods: ['PUT', 'PATCH'])]
+    /**
+     * @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *             example={"shipping": {"clients" : 1, "user" : 1}, "shippingProducts" : {{"product_id" : 1, "quantity" : 10},{"product_id" : 15,"quantity" : 5}}}
+     *           )
+     *         )
+     *  )
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Supprime une commande",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={"message": "Expédition mise à jour"}
+     *     )     
+     * )
+     *  @OA\Tag(name="Shippings")
+     * )
+     *
+     * @param Request $request
+     * @param Shipping $shipping
+     * @param EntityManagerInterface $entityManager
+     * @param UserRepository $userRepository
+     * @param ClientsRepository $clientsRepository
+     * @param SerializerInterface $serializer
+     * @param ManagerRegistry $doctrine
+     * @param integer $id
+     * @return Response
+     */
     public function edit(Request $request, Shipping $shipping, EntityManagerInterface $entityManager, UserRepository $userRepository, ClientsRepository $clientsRepository, SerializerInterface $serializer, ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
@@ -132,11 +247,26 @@ class ShippingController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse([
-            'success_message' => 'Expédition mis à jour.'
+            'success_message' => 'Expédition mise à jour.'
         ]);
     }
 
-    #[Route('/{id}', name: '= shipping_delete', methods: ['POST'])]
+    #[Route('/{id}', name: '= shipping_delete', methods: ['DELETE'])]
+    /**
+      * @OA\Response(
+     *     response=200,
+     *     description="Supprime une commande",
+     *     @OA\JsonContent(
+     *        type="string",
+     *        example={"message": "Expédition supprimée"}
+     *     )     
+     * )
+     *  @OA\Tag(name="Shippings")
+     *
+     * @param ManagerRegistry $doctrine
+     * @param integer $id
+     * @return Response
+     */
     public function delete(ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
@@ -151,7 +281,7 @@ class ShippingController extends AbstractController
         $entityManager->remove($shipping);
         $entityManager->flush();
         return new JsonResponse([
-            'success_message' => 'Expédition supprimé.'
+            'success_message' => 'Expédition supprimée.'
         ]);
     }
 }
