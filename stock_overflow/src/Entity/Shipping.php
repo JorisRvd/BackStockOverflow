@@ -20,24 +20,33 @@ class Shipping
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'shippings')]
     #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @Groups({"get_shippings"})
+     */
     private ?Clients $clients = null;
-
-    #[ORM\ManyToMany(targetEntity: ShippingItem::class, inversedBy: 'shippings')]
-    private Collection $shipping_item;
 
     #[ORM\ManyToOne(inversedBy: 'shippings')]
     #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @Groups({"get_shippings"})
+     */
     private ?User $user = null;
+
+    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'shippings')]
+    /**
+     * @Groups({"get_shippings"})
+     */
+    private Collection $product;
 
     public function __construct()
     {
-        $this->shipping_item = new ArrayCollection();
+        $this->product = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,30 +78,6 @@ class Shipping
         return $this;
     }
 
-    /**
-     * @return Collection<int, ShippingItem>
-     */
-    public function getShippingItem(): Collection
-    {
-        return $this->shipping_item;
-    }
-
-    public function addShippingItem(ShippingItem $shippingItem): static
-    {
-        if (!$this->shipping_item->contains($shippingItem)) {
-            $this->shipping_item->add($shippingItem);
-        }
-
-        return $this;
-    }
-
-    public function removeShippingItem(ShippingItem $shippingItem): static
-    {
-        $this->shipping_item->removeElement($shippingItem);
-
-        return $this;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -101,6 +86,30 @@ class Shipping
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProduct(): Collection
+    {
+        return $this->product;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->product->contains($product)) {
+            $this->product->add($product);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        $this->product->removeElement($product);
 
         return $this;
     }

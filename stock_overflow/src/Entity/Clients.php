@@ -18,31 +18,31 @@ class Clients
 
     #[ORM\Column(length: 255)]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?string $company = null;
 
     #[ORM\Column(length: 255)]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?string $address = null;
 
     #[ORM\Column]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?int $zip_code = null;
 
     #[ORM\Column(length: 255)]
     /**
-     *@Groups({"get_client"})
+     *@Groups({"get_client", "get_shippings"})
      */
     private ?string $phone = null;
 

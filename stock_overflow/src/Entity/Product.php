@@ -25,55 +25,54 @@ class Product
     #[ORM\Column(length: 255)]
     /**
      *  @Groups({"get_category"})
-     *  @Groups({"get_products", "get_orders", "get_client"})
+     *  @Groups({"get_products", "get_orders", "get_client", "get_shippings"})
      */
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     /**
      *  @Groups({"get_products"})
-     *  @Groups({"get_category"})
+     *  @Groups({"get_category", "get_shippings"})
      */
     private ?string $description = null;
 
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
-     *  @Groups({"get_category"})
+     *  @Groups({"get_category", "get_shippings"})
      */
     private ?int $quantity = null;
 
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
-     *  @Groups({"get_category", "get_orders"})
+     *  @Groups({"get_category", "get_orders", "get_shippings"})
      */
     private ?int $price = null;
 
     #[ORM\Column]
     /**
      *  @Groups({"get_products"})
-     *  @Groups({"get_category"})
+     *  @Groups({"get_category", "get_shippings"})
      */
     private ?bool $is_active = null;
 
     #[ORM\ManyToOne(inversedBy: 'products', cascade:['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     /**
-     *  @Groups({"get_products","get_orders"})
+     *  @Groups({"get_products","get_orders", "get_shippings"})
      */
     private ?ProductCategory $product_category = null;
-
-    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ShippingItem::class)]
-    private Collection $shippingItems;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Order::class)]
     private Collection $orders;
 
+    #[ORM\ManyToMany(targetEntity: Shipping::class, mappedBy: 'product')]
+    private Collection $shippings;
+
     public function __construct()
     {
-        $this->shippingItems = new ArrayCollection();
-        $this->orders = new ArrayCollection();
+        $this->shippings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -154,36 +153,6 @@ class Product
     }
 
     /**
-     * @return Collection<int, ShippingItem>
-     */
-    public function getShippingItems(): Collection
-    {
-        return $this->shippingItems;
-    }
-
-    public function addShippingItem(ShippingItem $shippingItem): static
-    {
-        if (!$this->shippingItems->contains($shippingItem)) {
-            $this->shippingItems->add($shippingItem);
-            $shippingItem->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShippingItem(ShippingItem $shippingItem): static
-    {
-        if ($this->shippingItems->removeElement($shippingItem)) {
-            // set the owning side to null (unless already changed)
-            if ($shippingItem->getProduct() === $this) {
-                $shippingItem->setProduct(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Order>
      */
     public function getOrders(): Collection
@@ -208,6 +177,33 @@ class Product
             if ($order->getProduct() === $this) {
                 $order->setProduct(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shipping>
+     */
+    public function getShippings(): Collection
+    {
+        return $this->shippings;
+    }
+
+    public function addShipping(Shipping $shipping): static
+    {
+        if (!$this->shippings->contains($shipping)) {
+            $this->shippings->add($shipping);
+            $shipping->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShipping(Shipping $shipping): static
+    {
+        if ($this->shippings->removeElement($shipping)) {
+            $shipping->removeProduct($this);
         }
 
         return $this;
