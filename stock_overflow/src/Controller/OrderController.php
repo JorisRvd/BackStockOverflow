@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use Exception;
 use App\Entity\Order;
 use App\Enums\OrderStatus;
 use OpenApi\Annotations as OA;
@@ -89,35 +90,37 @@ class OrderController extends AbstractController
         try {
             $newOrder = $serializer->deserialize($json, Order::class, 'json');
         } catch (NotEncodableValueException $e) {
-            return $this->json(
-                ['error' => 'JSON invalide'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+            throw new Exception($e->getMessage(), $e->getCode());
         }
 
         // On vérifie que la date est inférieure ou égale à la date du jour, sinon on renvoi une erreur
         if ($date <= $newOrder->getDate()) {
-            return $this->json([
-                "message" => "Merci de renseigner une date inférieure ou égale à la date du jour"
-            ], 400);
+            throw new Exception('Merci de renseigner une date inférieure ou égale à la date du jour', 400);
         }
 
         $errors = $validator->validate($newOrder);
         if (count($errors) > 0) {
-            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+            throw new Exception((string)$errors ,422);
         }
         // Si les champs user_id et/ou product_id sont vides, on renvoi une erreur 
-        if (empty($jsonBis['user_id']) || empty($jsonBis['product_id'])) {
+        if (empty($jsonBis['user_id'])){
+            throw new Exception('Merci de remplir le champ user', 500);
+        }  elseif($jsonBis['product_id']) {
+            throw new Exception('Merci de remplir le champ product', 500);
 
-            return new JsonResponse(["message" => "Merci de bien remplir les champs user_id et product_id"]);
-
-        } else {
-
+        }
             $user = $userRepository->find($jsonBis['user_id']);
             $product = $productRepository->find($jsonBis['product_id']);
+
+        if (!$user) {
+            throw $this->createNotFoundException("L'utilisateur avec l'ID ".$jsonBis['user_id']." n'a pas été trouvé");
+        } elseif(!$product) {
+            throw $this->createNotFoundException("Le produit avec l'ID ".$jsonBis['product_id']." n'a pas été trouvé");
+        }else {
             $newOrder->setUser($user);
             $newOrder->setProduct($product);
         }
+
         $entityManager = $doctrine->getManager();
         $entityManager->persist($newOrder);
         $entityManager->flush();
@@ -147,16 +150,15 @@ class OrderController extends AbstractController
      *  @OA\Tag(name="Orders")
      * )
      *
-     * @param Order $order
+     * @param OrderRepository $orderRepository
      * @param integer $id
      * @return Response
      */
-    public function show(Order $order, int $id): Response
+    public function show(OrderRepository $orderRepository, int $id): Response
     {
+        $order = $orderRepository->find($id);
         if(!$order) {
-            return new JsonResponse([
-                'error_message' => "La commande avec l'id".$id."n'existe pas."
-            ], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException("La commande avec l'ID ".$id." n'existe pas."); 
         }
         return $this->json($order, 200, [], 
         [
@@ -200,7 +202,7 @@ class OrderController extends AbstractController
 
         // On vérifie que la commande existe
         if (!$order) {
-            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
+            throw $this->createNotFoundException('La commande avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
         $json = $request->getContent();
@@ -211,9 +213,7 @@ class OrderController extends AbstractController
 
         // On vérifie que la date est inférieure ou égale à la date du jour, sinon on renvoi une erreur
         if (!empty($jsonBis['date']) && $date <= $updateOrder->getDate()) {
-            return $this->json([
-                "message" => "Merci de renseigner une date inférieure ou égale à la date du jour"
-            ], 400);
+            throw new Exception('Merci de renseigner une date inférieure ou égale à la date du jour', 400);
         }
 
         // On vérifie si on modifie le produit
@@ -266,7 +266,7 @@ class OrderController extends AbstractController
         $order = $entityManager->getRepository(Order::class)->find($id);
 
         if (!$order) {
-            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
+            throw $this->createNotFoundException('La commande avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
         $entityManager->remove($order);
@@ -276,15 +276,4 @@ class OrderController extends AbstractController
             'message' => 'Commande supprimée.'
         ]);
     }
-
-    // #[Route('/orders/all', name: 'orders_all', methods: ['GET'])]
-    // public function getAllProducts(OrderRepository $orderRepository): Response
-    // {
-    //     $orders = $orderRepository->findAll();
-    
-    //     return $this->json($orders, 200, [], [
-    //         'groups' => 'get_orders'
-    //     ]);
-    // }
-    
 }

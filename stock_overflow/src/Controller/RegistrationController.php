@@ -2,21 +2,22 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\User;
+use OpenApi\Annotations as OA;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -59,10 +60,8 @@ class RegistrationController extends AbstractController
          
      } catch (NotEncodableValueException $e) {
          // Si le JSON fourni est "malformé" ou manquant, on prévient le client
-         return $this->json(
-             ['error' => 'JSON invalide'],
-             Response::HTTP_UNPROCESSABLE_ENTITY
-         );
+         throw new Exception($e->getMessage(), $e->getCode());
+
      }
      
       //hash password
@@ -79,8 +78,8 @@ class RegistrationController extends AbstractController
      // Y'a-t-il des erreurs ?
      if (count($errors) > 0) {
          // @todo Retourner des erreurs de validation propres
-         return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
-     }
+         throw new Exception((string)$errors ,422);
+        }
 
      
      // On sauvegarde l'entité
@@ -88,7 +87,7 @@ class RegistrationController extends AbstractController
      $em->persist($newUser);
      $em->flush();
      return new JsonResponse([
-       'success_message' => 'Thank you for registering'
+       'success_message' => 'Merci de vous être inscrit.'
      ]);
      
     }

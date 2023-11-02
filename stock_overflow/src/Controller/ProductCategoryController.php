@@ -2,21 +2,23 @@
 
 namespace App\Controller;
 
+use Exception;
+use OpenApi\Annotations as OA;
 use App\Entity\ProductCategory;
-use App\Repository\ProductCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use App\Repository\ProductCategoryRepository;
+use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 #[Route('/product/category')]
 class ProductCategoryController extends AbstractController
@@ -82,17 +84,14 @@ class ProductCategoryController extends AbstractController
             
         } catch (NotEncodableValueException $e) {
             // Si le JSON fourni est "malformé" ou manquant, on prévient le client
-            return $this->json(
-                ['error' => 'JSON invalide'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+            throw new Exception($e->getMessage(), $e->getCode());
         }
         $errors = $validator->validate($newProductCategory);
 
         // Y'a-t-il des erreurs ?
         if (count($errors) > 0) {
             // @todo Retourner des erreurs de validation propres
-            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return $this->json(throw new Exception((string)$errors ,422));
         }
 
         // On sauvegarde l'entité
@@ -116,16 +115,15 @@ class ProductCategoryController extends AbstractController
      * )
      *  @OA\Tag(name="Products_category")
      * )
-     * @param ProductCategory $productCategory
+     * @param ProductCategoryRepository $productCategoryRepository
      * @param integer $id
      * @return Response
      */
-    public function getProductCategory(ProductCategory $productCategory, int $id): Response
+    public function getProductCategory(ProductCategoryRepository $productCategoryRepository, int $id): Response
     {
+        $productCategory = $productCategoryRepository->find($id);
         if (!$productCategory) {
-            return new JsonResponse([
-                'error_message' => 'La catégorie de produit avec l\'ID ' . $id . ' n\'existe pas.'
-            ], Response::HTTP_NOT_FOUND);
+           throw $this->createNotFoundException('La catégorie de produit avec l\'ID ' . $id . ' n\'existe pas.');
         }
         return $this->json($productCategory, 200, [], 
         [
@@ -154,21 +152,20 @@ class ProductCategoryController extends AbstractController
      * @OA\Tag(name="Products_category")
      *
      * @param Request $request
-     * @param ProductCategory $productCategory
+     * @param ProductCategoryRepository $productCategoryRepository
      * @param EntityManagerInterface $entityManager
      * @param integer $id
      * @param ManagerRegistry $doctrine
      * @param SerializerInterface $serializer
      * @return Response
      */
-    public function edit(Request $request, ProductCategory $productCategory, EntityManagerInterface $entityManager, int $id, ManagerRegistry $doctrine, SerializerInterface $serializer): Response
+    public function edit(Request $request, ProductCategoryRepository $productCategoryRepository, EntityManagerInterface $entityManager, int $id, ManagerRegistry $doctrine, SerializerInterface $serializer): Response
     {
-        $entityManager = $doctrine->getManager();
 
-        $productCategory = $entityManager->getRepository(ProductCategory::class)->find($id);
+        $productCategory = $productCategoryRepository->find($id);
 
         if (!$productCategory) {
-            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
+            throw $this->createNotFoundException('La catégorie avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
         $content = $request->getContent(); // Get json from request
@@ -181,7 +178,7 @@ class ProductCategoryController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'product_category_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'product_category_delete', methods: ['DELETE'])]
     /**
      *  @OA\Response(
      *     response=200,
@@ -203,7 +200,7 @@ class ProductCategoryController extends AbstractController
 
         if (!$productCategory) {
             throw $this->createNotFoundException(
-                'No product category found for id '.$id
+                'La catégorie avec l\'ID ' . $id . ' n\'existe pas.'
             );
         }
 
@@ -213,14 +210,4 @@ class ProductCategoryController extends AbstractController
             'success_message' => 'Catégorie de produit supprimé.'
         ]);
     }
-
-    // #[Route('/productcat/all', name: 'productcat_all', methods: ['GET'])]
-    // public function getAllUsers(ProductCategoryRepository $productCategoryRepository): Response
-    // {
-    //     $productsCategory = $productCategoryRepository->findAll();
-    
-    //     return $this->json($productsCategory, 200, [], [
-    //         'groups' => 'get_category'
-    //     ]);
-    // }
 }

@@ -12,7 +12,6 @@ class ErrorController extends AbstractController
     #[Route('/error', name: 'app_error')]
     public function show(FlattenException $exception): Response
     {
-        // dd($exception);
         return $this->render('error/error.html.twig', [
             'error' => $exception,
         ]);

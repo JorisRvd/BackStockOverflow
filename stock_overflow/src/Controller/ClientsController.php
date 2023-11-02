@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use Exception;
 use App\Entity\Clients;
 use App\Form\ClientsType;
+use OpenApi\Annotations as OA;
 use App\Repository\ClientsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,9 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use OpenApi\Annotations as OA;
 
 #[Route('/clients')]
 class ClientsController extends AbstractController
@@ -82,17 +83,15 @@ class ClientsController extends AbstractController
             $newClient = $serializer->deserialize($jsonContent, Clients::class, 'json');
         } catch (NotEncodableValueException $e) {
              // Si le JSON fourni est "malformé" ou manquant, on prévient le client
-             return $this->json(
-                ['error' => 'JSON invalide'],
-                Response::HTTP_UNPROCESSABLE_ENTITY
-            );
+             throw new Exception($e->getMessage(), $e->getCode());
+
         }
         $errors = $validator->validate($newClient);
 
         // Y'a-t-il des erreurs ?
         if (count($errors) > 0) {
             // @todo Retourner des erreurs de validation propres
-            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+            throw new Exception((string)$errors ,422);
         }
 
         // On sauvegarde l'entité
@@ -105,7 +104,7 @@ class ClientsController extends AbstractController
                 "message" => "Client créé",
                 "data" => $newClient
             ]), 201, [], [
-                ""
+                "groups" => "get_clients"
             ]);
 
     }
@@ -122,16 +121,15 @@ class ClientsController extends AbstractController
      * )
      *  @OA\Tag(name="Clients")
      *
-     * @param Clients $client
+     * @param ClientsRepository $clientsRepository
      * @param integer $id
      * @return Response
      */
-    public function show(Clients $client, int $id): Response
+    public function show(ClientsRepository $clientsRepository, int $id): Response
     {
+        $client = $clientsRepository->find($id);
         if(!$client) {
-            return new JsonResponse([
-                'error_message' => "La commande avec l'id".$id."n'existe pas."
-            ], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException("Le client avec l'ID ".$id." n'existe pas.");
         }
         return $this->json($client, 200);
     }
@@ -170,7 +168,7 @@ class ClientsController extends AbstractController
 
         // On vérifie que la commande existe
         if (!$client) {
-            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
+            throw $this->createNotFoundException('Le client avec l\'ID ' . $id . ' n\'existe pas.');
         }
         $json = $request->getContent();
         $updateClient = $serializer->deserialize($json, Clients::class, 'json',[AbstractNormalizer::OBJECT_TO_POPULATE => $client]);
@@ -207,7 +205,7 @@ class ClientsController extends AbstractController
         $client = $entityManager->getRepository(Clients::class)->find($id);
 
         if (!$client) {
-            throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
+            throw $this->createNotFoundException('Le client avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
         $entityManager->remove($client);

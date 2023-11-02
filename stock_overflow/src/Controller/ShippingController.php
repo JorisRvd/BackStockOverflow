@@ -3,14 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Shipping;
-use App\Entity\ShippingItem;
-use App\Form\ShippingType;
 use App\Repository\ClientsRepository;
 use App\Repository\ProductRepository;
-use App\Repository\ShippingItemRepository;
 use App\Repository\ShippingRepository;
 use App\Repository\UserRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
@@ -113,13 +109,13 @@ class ShippingController extends AbstractController
             $newShipping = $serializer->deserialize($jsonContent, Shipping::class, 'json');
         } catch (NotEncodableValueException $e) {
             // Si le JSON fourni est "malformé" ou manquant, prévenez le client
-            return $this->json(throw new Exception('JSON invalide',422));
+            throw new Exception($e->getMessage(), $e->getCode());
         }
 
         $errors = $validator->validate($newShipping);
 
         if (count($errors) > 0) {
-            return $this->json(throw new Exception((string)$errors ,422));
+            throw new Exception((string)$errors ,422);
         }
 
         $user = $userRepository->find($jsonDecode['shipping']['user']);
@@ -128,10 +124,10 @@ class ShippingController extends AbstractController
         $date = new \DateTime();
 
         if (!$user) {
-            throw new Exception('Utilisateur non trouvé');
+            throw $this->createNotFoundException("L'utilisateur avec l'ID ".$jsonDecode['shipping']['user']." n'existe pas.");
 
         }elseif(!$client) {
-            throw new Exception('Client non trouvé');
+            throw $this->createNotFoundException("Le client avec l'ID ".$jsonDecode['shipping']['clients']." n'existe pas.");
         }
 
         if ($user && $client) {
@@ -141,9 +137,11 @@ class ShippingController extends AbstractController
 
             foreach ($jsonDecode['shippingProducts'] as $itemData) {
                 $product = $productRepository->find($itemData['product_id']);
-                // dd($product);
+                
 
-                if ($product) {
+                if (!$product) {
+                    throw $this->createNotFoundException("Le produit avec l'ID ".$itemData['product_id']." n'existe pas.");
+                } else {
                     $newShipping->addProduct($product);
                     $quantity = $product->getQuantity();
                     if ($itemData['quantity']) {
@@ -179,7 +177,7 @@ class ShippingController extends AbstractController
      * ) 
      *  @OA\Tag(name="Shippings")
      *
-     * @param Shipping $shipping
+     * @param ShippingRepository $shippingRepository
      * @param integer $id
      * @return Response
      */
@@ -222,7 +220,7 @@ class ShippingController extends AbstractController
      * )
      *
      * @param Request $request
-     * @param Shipping $shipping
+     * @param ShippingRepository $shippingRepository
      * @param EntityManagerInterface $entityManager
      * @param UserRepository $userRepository
      * @param ClientsRepository $clientsRepository
@@ -231,11 +229,11 @@ class ShippingController extends AbstractController
      * @param integer $id
      * @return Response
      */
-    public function edit(Request $request, Shipping $shipping, EntityManagerInterface $entityManager, UserRepository $userRepository, ClientsRepository $clientsRepository, SerializerInterface $serializer, ManagerRegistry $doctrine, int $id): Response
+    public function edit(Request $request, ShippingRepository $shippingRepository, EntityManagerInterface $entityManager, UserRepository $userRepository, ClientsRepository $clientsRepository, SerializerInterface $serializer, ManagerRegistry $doctrine, int $id): Response
     {
         $entityManager = $doctrine->getManager();
 
-        $shipping = $entityManager->getRepository(Shipping::class)->find($id);
+        $shipping = $shippingRepository->find($id);
 
         if (!$shipping) {
             throw $this->createNotFoundException('L\'expédition avec l\'ID ' . $id . ' n\'existe pas.');
@@ -280,9 +278,7 @@ class ShippingController extends AbstractController
         $shipping = $entityManager->getRepository(Shipping::class)->find($id);
 
         if (!$shipping) {
-            throw $this->createNotFoundException(
-                'No shipping found for id ' . $id
-            );
+            throw $this->createNotFoundException('L\'expédition avec l\'ID ' . $id . ' n\'existe pas.');
         }
 
         $entityManager->remove($shipping);

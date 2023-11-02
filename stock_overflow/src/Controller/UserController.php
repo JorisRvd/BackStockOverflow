@@ -43,9 +43,7 @@ class UserController extends AbstractController
     public function show(User $user, int $id): Response
     {
         if (!$user) {
-            return new JsonResponse([
-                'error_message' => "L'utilisateur' avec l\'ID ' . $id . ' n\'existe pas."
-            ], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException( "L'utilisateur' avec l\'ID ' . $id . ' n\'existe pas.");
         }
         return $this->json($user, 200, [], 
         [
@@ -123,9 +121,7 @@ class UserController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($id);
 
         if (!$user) {
-            throw $this->createNotFoundException(
-                'No user found for id '.$id
-            );
+            throw $this->createNotFoundException("L'utilisateur' avec l\'ID ' . $id . ' n\'existe pas");
         }
 
         $entityManager->remove($user);
