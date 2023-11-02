@@ -144,8 +144,9 @@ class ShippingController extends AbstractController
                 } else {
                     $newShipping->addProduct($product);
                     $quantity = $product->getQuantity();
-                    if ($itemData['quantity']) {
-                        $newQuantity = $quantity - $itemData['quantity'];
+                    if ($jsonDecode['shipping']['nb_shipped']) {
+                        $newShipping->setnbShipped($jsonDecode['shipping']['nb_shipped']);
+                        $newQuantity = $quantity - $jsonDecode['shipping']['nb_shipped'];
                         if ($newQuantity < 0) {
                             throw new Exception("La quantité du produit {$product->getName()} en stock n'est pas suffisante", 500);
                         }
