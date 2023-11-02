@@ -18,7 +18,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     /**
-     *   @Groups({"get_products", "get_orders", "get_user"})
+     *   @Groups({"get_products", "get_orders", "get_user", "get_shippings"})
      */
     private ?int $id = null;
 

@@ -113,19 +113,26 @@ class ShippingController extends AbstractController
             $newShipping = $serializer->deserialize($jsonContent, Shipping::class, 'json');
         } catch (NotEncodableValueException $e) {
             // Si le JSON fourni est "malformé" ou manquant, prévenez le client
-            return $this->json(['error' => 'JSON invalide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return $this->json(throw new Exception('JSON invalide',422));
         }
 
         $errors = $validator->validate($newShipping);
 
         if (count($errors) > 0) {
-            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return $this->json(throw new Exception((string)$errors ,422));
         }
 
         $user = $userRepository->find($jsonDecode['shipping']['user']);
         $client = $clientRepository->find($jsonDecode['shipping']['clients']);
 
         $date = new \DateTime();
+
+        if (!$user) {
+            throw new Exception('Utilisateur non trouvé');
+
+        }elseif(!$client) {
+            throw new Exception('Client non trouvé');
+        }
 
         if ($user && $client) {
             $newShipping->setUser($user);
@@ -134,6 +141,7 @@ class ShippingController extends AbstractController
 
             foreach ($jsonDecode['shippingProducts'] as $itemData) {
                 $product = $productRepository->find($itemData['product_id']);
+                // dd($product);
 
                 if ($product) {
                     $newShipping->addProduct($product);
@@ -143,7 +151,7 @@ class ShippingController extends AbstractController
                         if ($newQuantity < 0) {
                             throw new Exception("La quantité du produit {$product->getName()} en stock n'est pas suffisante", 500);
                         }
-                        $product->setQuantity($newQuantity);
+                        $product->setQuantity($itemData['quantity']);
                     }
                 }
                 $entityManager->persist($newShipping);
@@ -153,7 +161,7 @@ class ShippingController extends AbstractController
             return $this->json($newShipping, Response::HTTP_CREATED, [], ['groups' => 'get_shippings']);
         }
 
-        return $this->json(['error' => 'Utilisateur ou client non trouvé']);
+        // return $this->json(throw new Exception('Utilisateur ou client non trouvé'));
     }
 
     #[Route('/{id}', name: '= shipping_show', methods: ['GET'])]
@@ -175,12 +183,11 @@ class ShippingController extends AbstractController
      * @param integer $id
      * @return Response
      */
-    public function show(Shipping $shipping, int $id): Response
+    public function show(ShippingRepository $shippingRepository, int $id): Response
     {
+        $shipping = $shippingRepository->find($id);
         if (!$shipping) {
-            return new JsonResponse([
-                'error_message' => 'L\'expédition avec l\'ID ' . $id . ' n\'existe pas.'
-            ], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('L\'expédition avec l\'ID ' . $id . ' n\'existe pas.');
         }
         return $this->json(
             $shipping,
