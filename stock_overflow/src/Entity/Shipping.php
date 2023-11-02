@@ -47,6 +47,12 @@ class Shipping
      */
     private Collection $product;
 
+    #[ORM\Column]
+    /**
+     * @Groups({"get_shippings"})
+     */
+    private ?int $nbShipped = null;
+
     public function __construct()
     {
         $this->product = new ArrayCollection();
@@ -113,6 +119,18 @@ class Shipping
     public function removeProduct(Product $product): static
     {
         $this->product->removeElement($product);
+
+        return $this;
+    }
+
+    public function getNbShipped(): ?int
+    {
+        return $this->nbShipped;
+    }
+
+    public function setNbShipped(int $nbShipped): static
+    {
+        $this->nbShipped = $nbShipped;
 
         return $this;
     }
