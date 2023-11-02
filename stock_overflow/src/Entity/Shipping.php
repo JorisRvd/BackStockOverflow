@@ -16,6 +16,9 @@ class Shipping
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    /**
+     *@Groups({"get_client", "get_shippings"})
+     */
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
