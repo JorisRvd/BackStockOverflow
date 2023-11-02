@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231102143718 extends AbstractMigration
+final class Version20231102151523 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -24,7 +24,6 @@ final class Version20231102143718 extends AbstractMigration
         $this->addSql('CREATE TABLE `order` (id INT AUTO_INCREMENT NOT NULL, product_id INT NOT NULL, user_id INT NOT NULL, date DATE NOT NULL, quantity INT NOT NULL, status VARCHAR(255) NOT NULL, INDEX IDX_F52993984584665A (product_id), INDEX IDX_F5299398A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product (id INT AUTO_INCREMENT NOT NULL, product_category_id INT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, quantity INT NOT NULL, price INT NOT NULL, is_active TINYINT(1) NOT NULL, INDEX IDX_D34A04ADBE6903FD (product_category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product_category (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE role (id INT AUTO_INCREMENT NOT NULL, role VARCHAR(10) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE shipping (id INT AUTO_INCREMENT NOT NULL, clients_id INT NOT NULL, user_id INT NOT NULL, date DATETIME NOT NULL, nb_shipped INT NOT NULL, INDEX IDX_2D1C1724AB014612 (clients_id), INDEX IDX_2D1C1724A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE shipping_product (shipping_id INT NOT NULL, product_id INT NOT NULL, INDEX IDX_350202694887F3F8 (shipping_id), INDEX IDX_350202694584665A (product_id), PRIMARY KEY(shipping_id, product_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -51,7 +50,6 @@ final class Version20231102143718 extends AbstractMigration
         $this->addSql('DROP TABLE `order`');
         $this->addSql('DROP TABLE product');
         $this->addSql('DROP TABLE product_category');
-        $this->addSql('DROP TABLE role');
         $this->addSql('DROP TABLE shipping');
         $this->addSql('DROP TABLE shipping_product');
         $this->addSql('DROP TABLE user');
