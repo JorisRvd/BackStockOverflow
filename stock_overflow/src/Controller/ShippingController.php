@@ -115,7 +115,7 @@ class ShippingController extends AbstractController
         $errors = $validator->validate($newShipping);
 
         if (count($errors) > 0) {
-            throw new Exception((string)$errors ,422);
+            throw new Exception((string)$errors, 422);
         }
 
         $user = $userRepository->find($jsonDecode['shipping']['user']);
@@ -124,10 +124,9 @@ class ShippingController extends AbstractController
         $date = new \DateTime();
 
         if (!$user) {
-            throw $this->createNotFoundException("L'utilisateur avec l'ID ".$jsonDecode['shipping']['user']." n'existe pas.");
-
-        }elseif(!$client) {
-            throw $this->createNotFoundException("Le client avec l'ID ".$jsonDecode['shipping']['clients']." n'existe pas.");
+            throw $this->createNotFoundException("L'utilisateur avec l'ID " . $jsonDecode['shipping']['user'] . " n'existe pas.");
+        } elseif (!$client) {
+            throw $this->createNotFoundException("Le client avec l'ID " . $jsonDecode['shipping']['clients'] . " n'existe pas.");
         }
 
         if ($user && $client) {
@@ -137,10 +136,10 @@ class ShippingController extends AbstractController
 
             foreach ($jsonDecode['shippingProducts'] as $itemData) {
                 $product = $productRepository->find($itemData['product_id']);
-                
+
 
                 if (!$product) {
-                    throw $this->createNotFoundException("Le produit avec l'ID ".$itemData['product_id']." n'existe pas.");
+                    throw $this->createNotFoundException("Le produit avec l'ID " . $itemData['product_id'] . " n'existe pas.");
                 } else {
                     $newShipping->addProduct($product);
                     $quantity = $product->getQuantity();
@@ -150,7 +149,7 @@ class ShippingController extends AbstractController
                         if ($newQuantity < 0) {
                             throw new Exception("La quantité du produit {$product->getName()} en stock n'est pas suffisante", 500);
                         }
-                        $product->setQuantity($itemData['quantity']);
+                        $product->setQuantity($newQuantity);
                     }
                 }
                 $entityManager->persist($newShipping);
@@ -259,7 +258,7 @@ class ShippingController extends AbstractController
 
     #[Route('/{id}', name: '= shipping_delete', methods: ['DELETE'])]
     /**
-      * @OA\Response(
+     * @OA\Response(
      *     response=200,
      *     description="Supprime une commande",
      *     @OA\JsonContent(
