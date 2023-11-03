@@ -86,7 +86,7 @@ class OrderController extends AbstractController
         $jsonBis = json_decode($json, true);
 
         $date = new DateTime('now');
-       
+    //    dd($jsonBis);
         try {
             $newOrder = $serializer->deserialize($json, Order::class, 'json');
         } catch (NotEncodableValueException $e) {
@@ -105,7 +105,7 @@ class OrderController extends AbstractController
         // Si les champs user_id et/ou product_id sont vides, on renvoi une erreur 
         if (empty($jsonBis['user_id'])){
             throw new Exception('Merci de remplir le champ user', 500);
-        }  elseif($jsonBis['product_id']) {
+        }  elseif(empty($jsonBis['product_id'])) {
             throw new Exception('Merci de remplir le champ product', 500);
 
         }
