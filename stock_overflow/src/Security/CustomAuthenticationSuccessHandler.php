@@ -21,21 +21,20 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
     }
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        $user = $token->getUser(); // Obtenez l'utilisateur à partir du token
+        $user = $token->getUser(); // Obtention du token
 
         if (!$user instanceof UserInterface) {
             // Gérez le cas où l'utilisateur n'est pas du bon type
-            // Vous pouvez lancer une exception ou gérer cette situation de manière appropriée.
         }
 
-        // Générez le jeton JWT avec des réclamations personnalisées
+        // Génération du jeton JWT avec des paramètres personnalisés
         $payload = [
             'user_id' => $user->getId(),
         ];
 
-        // Créez le jeton JWT avec les réclamations personnalisées
+        // Création du jeton JWT avec les paramètres personnalisés
         $jwt = $this->jwtManager->create($user, $payload);
-        // Envoyez le jeton JWT dans la réponse
+        // Envoi du jeton JWT dans la réponse
         return new JsonResponse(['token' => $jwt, 'userid' => $user->getId(), 'firstName' => $user->getFirstName(), "lastName" => $user->getLastName(), 'email' => $user->getEmail()]);
 }
 }
